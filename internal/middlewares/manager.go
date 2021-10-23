@@ -3,7 +3,8 @@ package middlewares
 import (
 	"github.com/Yangiboev/golang-with-curiosity/config"
 	"github.com/Yangiboev/golang-with-curiosity/pkg/logger"
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v4"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
@@ -18,23 +19,23 @@ var (
 // MiddlewareManager http middlewares
 type middlewareManager struct {
 	log logger.Logger
-	cfg *config.Config
+	cfg config.Config
 }
 
 // MiddlewareManager interface
 type MiddlewareManager interface {
-	Metrics(next gin.HandlerFunc) gin.HandlerFunc
+	Metrics(next echo.HandlerFunc) echo.HandlerFunc
 }
 
 // NewMiddlewareManager constructor
-func NewMiddlewareManager(log logger.Logger, cfg *config.Config) *middlewareManager {
+func NewMiddlewareManager(log logger.Logger, cfg config.Config) *middlewareManager {
 	return &middlewareManager{log: log, cfg: cfg}
 }
 
 // Metrics prometheus metrics
-func (m *middlewareManager) Metrics(next gin.HandlerFunc) gin.HandlerFunc {
-	return func(c *gin.Context) {
+func (m *middlewareManager) Metrics(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
 		httpTotalRequests.Inc()
-		c.Next()
+		return next(c)
 	}
 }

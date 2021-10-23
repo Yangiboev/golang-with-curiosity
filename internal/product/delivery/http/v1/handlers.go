@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Yangiboev/golang-with-curiosity/internal/middlewares"
 	"github.com/Yangiboev/golang-with-curiosity/internal/models"
 	"github.com/Yangiboev/golang-with-curiosity/internal/product"
 	"github.com/Yangiboev/golang-with-curiosity/pkg/logger"
@@ -17,7 +18,7 @@ type productHandlers struct {
 	log       logger.Logger
 	productUC product.UseCase
 	validate  *validator.Validate
-	group     *gin.Group
+	group     *echo.Group
 	mw        middlewares.MiddlewareManager
 }
 
@@ -26,7 +27,7 @@ func NewProductHandlers(
 	log logger.Logger,
 	productUC product.UseCase,
 	validate *validator.Validate,
-	group *gin.Group,
+	group *echo.Group,
 	mw middlewares.MiddlewareManager,
 ) *productHandlers {
 	return &productHandlers{log: log, productUC: productUC, validate: validate, group: group, mw: mw}
@@ -40,8 +41,8 @@ func NewProductHandlers(
 // @Produce json
 // @Success 201 {object} models.Product
 // @Router /products [post]
-func (p *productHandlers) CreateProduct() gin.HandlerFunc {
-	return func(c gin.Context) error {
+func (p *productHandlers) CreateProduct() echo.HandlerFunc {
+	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "productHandlers.Create")
 		defer span.Finish()
 		createRequests.Inc()
@@ -76,8 +77,8 @@ func (p *productHandlers) CreateProduct() gin.HandlerFunc {
 // @Param product_id path string true "product id"
 // @Success 200 {object} models.Product
 // @Router /products/{product_id} [put]
-func (p *productHandlers) UpdateProduct() gin.HandlerFunc {
-	return func(c gin.Context) error {
+func (p *productHandlers) UpdateProduct() echo.HandlerFunc {
+	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "productHandlers.Update")
 		defer span.Finish()
 		updateRequests.Inc()
@@ -122,8 +123,8 @@ func (p *productHandlers) UpdateProduct() gin.HandlerFunc {
 // @Param product_id path string true "product id"
 // @Success 200 {object} models.Product
 // @Router /products/{product_id} [get]
-func (p *productHandlers) GetByIDProduct() gin.HandlerFunc {
-	return func(c gin.Context) error {
+func (p *productHandlers) GetByIDProduct() echo.HandlerFunc {
+	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "productHandlers.GetByID")
 		defer span.Finish()
 		getByIdRequests.Inc()
@@ -158,8 +159,8 @@ func (p *productHandlers) GetByIDProduct() gin.HandlerFunc {
 // @Param size query string false "number of elements"
 // @Success 200 {object} models.ProductsList
 // @Router /products/search [get]
-func (p *productHandlers) SearchProduct() gin.HandlerFunc {
-	return func(c gin.Context) error {
+func (p *productHandlers) SearchProduct() echo.HandlerFunc {
+	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "productHandlers.Search")
 		defer span.Finish()
 		searchRequests.Inc()

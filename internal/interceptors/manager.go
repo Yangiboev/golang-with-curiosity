@@ -22,11 +22,11 @@ var (
 // InterceptorManager struct
 type InterceptorManager struct {
 	logger logger.Logger
-	cfg    *config.Config
+	cfg    config.Config
 }
 
 // NewInterceptorManager InterceptorManager constructor
-func NewInterceptorManager(logger logger.Logger, cfg *config.Config) *InterceptorManager {
+func NewInterceptorManager(logger logger.Logger, cfg config.Config) *InterceptorManager {
 	return &InterceptorManager{logger: logger, cfg: cfg}
 }
 
