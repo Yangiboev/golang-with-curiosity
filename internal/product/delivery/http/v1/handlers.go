@@ -10,6 +10,7 @@ import (
 	"github.com/Yangiboev/golang-with-curiosity/pkg/logger"
 	"github.com/Yangiboev/golang-with-curiosity/pkg/utils"
 	"github.com/go-playground/validator/v10"
+	"github.com/labstack/echo/v4"
 	"github.com/opentracing/opentracing-go"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
