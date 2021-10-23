@@ -3,6 +3,8 @@ package models
 import (
 	"time"
 
+	productsService "github.com/Yangiboev/golang-with-curiosity/proto/product"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

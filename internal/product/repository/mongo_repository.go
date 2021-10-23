@@ -90,7 +90,7 @@ func (p *productMongoRepo) GetByID(ctx context.Context, productID primitive.Obje
 }
 
 // Search Search product
-func (p *productMongoRepo) Search(ctx context.Context, search string, pagination *utils.PaginationUC) (*models.ProductsList, error) {
+func (p *productMongoRepo) Search(ctx context.Context, search string, pagination *utils.Pagination) (*models.ProductsList, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "productMongoRepo.Search")
 	defer span.Finish()
 

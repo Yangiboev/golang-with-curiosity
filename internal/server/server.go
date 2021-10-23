@@ -4,6 +4,9 @@ import (
 	"context"
 	"crypto/tls"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/Yangiboev/golang-with-curiosity/config"
@@ -12,18 +15,24 @@ import (
 	productsHttpV1 "github.com/Yangiboev/golang-with-curiosity/internal/product/delivery/http/v1"
 	"github.com/Yangiboev/golang-with-curiosity/internal/product/delivery/kafka"
 	"github.com/Yangiboev/golang-with-curiosity/internal/product/repository"
+	"github.com/Yangiboev/golang-with-curiosity/internal/product/usecase"
 	"github.com/Yangiboev/golang-with-curiosity/pkg/logger"
+	productsService "github.com/Yangiboev/golang-with-curiosity/proto/product"
 	"github.com/go-playground/validator/v10"
 	"github.com/go-redis/redis/v8"
 	grpcrecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/labstack/echo/v4"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/reflection"
+
 	"google.golang.org/grpc/keepalive"
 )
 
@@ -73,6 +82,7 @@ func (s *server) Run() error {
 	validate := validator.New()
 	productsProducer := kafka.NewProductsProducer(s.log, s.cfg)
 	productsProducer.Run()
+
 	productMongoRepo := repository.NewProductMongoRepo(s.mongoDB)
 	productRedisRepo := repository.NewProductRedisRepository(s.redis)
 	productUC := usecase.NewProductUC(productMongoRepo, productRedisRepo, s.log, productsProducer)
@@ -117,4 +127,35 @@ func (s *server) Run() error {
 		s.log.Infof("Server is listening on PORT: %s", s.cfg.Http.Port)
 		s.runHttpServer()
 	}()
+	go func() {
+		s.log.Infof("GRPC Server is listening on port: %s", s.cfg.Server.Port)
+		s.log.Fatal(grpcServer.Serve(l))
+	}()
+	if s.cfg.Server.Development {
+		reflection.Register(grpcServer)
+	}
+	metricsServer := echo.New()
+	go func() {
+		metricsServer.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
+		s.log.Infof("Metrics server is running on port: %s", s.cfg.Metrics.Port)
+		if err := metricsServer.Start(s.cfg.Metrics.Port); err != nil {
+			s.log.Error(err)
+			cancel()
+		}
+	}()
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	select {
+	case v := <-quit:
+		s.log.Errorf("signal.Notify: %v", v)
+	case done := <-ctx.Done():
+		s.log.Errorf("ctx.Done: %v", done)
+	}
+	if err := metricsServer.Shutdown(ctx); err != nil {
+		s.log.Errorf("metricsServer.Shutdown: %v", err)
+	}
+	grpcServer.GracefulStop()
+	s.log.Info("Server Exited Properly")
+
+	return nil
 }
