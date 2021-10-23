@@ -19,7 +19,7 @@ type ProductsConsumerGroup struct {
 	Brokers    []string
 	GroupID    string
 	log        logger.Logger
-	cfg        *config.Config
+	cfg        config.Config
 	productsUC product.UseCase
 	validate   *validator.Validate
 }
@@ -29,7 +29,7 @@ func NewProductsConsumerGroup(
 	brokers []string,
 	groupID string,
 	log logger.Logger,
-	cfg *config.Config,
+	cfg config.Config,
 	productsUC product.UseCase,
 	validate *validator.Validate,
 ) *ProductsConsumerGroup {

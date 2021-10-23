@@ -5,12 +5,12 @@ import (
 	"log"
 
 	"github.com/Yangiboev/golang-with-curiosity/config"
+	"github.com/Yangiboev/golang-with-curiosity/internal/server"
 	"github.com/Yangiboev/golang-with-curiosity/pkg/jaegar"
 	"github.com/Yangiboev/golang-with-curiosity/pkg/kafka"
 	"github.com/Yangiboev/golang-with-curiosity/pkg/logger"
 	"github.com/Yangiboev/golang-with-curiosity/pkg/mongodb"
 	"github.com/Yangiboev/golang-with-curiosity/pkg/redis"
-	"github.com/alicebob/miniredis/server"
 	"github.com/opentracing/opentracing-go"
 )
 
@@ -71,7 +71,14 @@ func main() {
 	}
 	appLogger.Infof("Kafka connected: %v", brokers)
 	redisClient := redis.NewRedisClient(cfg)
-	appLogger.Infof("Redis connected")
-	s := server.NewServer(app)
+	appLogger.Info("Redis connected")
 
+	s := server.NewServer(&server.ServerOptions{
+		Log:     appLogger,
+		Config:  cfg,
+		Tracer:  tracer,
+		MongoDB: mongoDBConn,
+		Redis:   redisClient,
+	})
+	appLogger.Fatal(s.Run())
 }

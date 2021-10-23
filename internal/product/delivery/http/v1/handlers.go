@@ -7,8 +7,10 @@ import (
 	"github.com/Yangiboev/golang-with-curiosity/internal/middlewares"
 	"github.com/Yangiboev/golang-with-curiosity/internal/models"
 	"github.com/Yangiboev/golang-with-curiosity/internal/product"
+	httpErrors "github.com/Yangiboev/golang-with-curiosity/pkg/http_errors"
 	"github.com/Yangiboev/golang-with-curiosity/pkg/logger"
 	"github.com/Yangiboev/golang-with-curiosity/pkg/utils"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/opentracing/opentracing-go"
@@ -170,13 +172,13 @@ func (p *productHandlers) SearchProduct() echo.HandlerFunc {
 		if err != nil {
 			p.log.Errorf("strconv.Atoi: %v", err)
 			errorRequests.Inc()
-			return httpErrors.ErrorCtxResponse(c, httpErrors.BadRequest)
+			return httpErrors.ErrorCtxResponse(c, httpErrors.ErrorBadRequest)
 		}
 		size, err := strconv.Atoi(c.QueryParam("size"))
 		if err != nil {
 			p.log.Errorf("strconv.Atoi: %v", err)
 			errorRequests.Inc()
-			return httpErrors.ErrorCtxResponse(c, httpErrors.BadRequest)
+			return httpErrors.ErrorCtxResponse(c, httpErrors.ErrorBadRequest)
 		}
 
 		pq := utils.NewPaginationQuery(size, page)
