@@ -17,7 +17,7 @@ type Config struct {
 	AppVersion string
 	Server     Server
 	Logger     Logger
-	Jaegar     Jaegar
+	Jaeger     Jaeger
 	Metrics    Metrics
 	MongoDB    MongoDB
 	Kafka      Kafka
@@ -58,8 +58,8 @@ type Metrics struct {
 	ServiceName string
 }
 
-//Jaegar config
-type Jaegar struct {
+//Jaeger config
+type Jaeger struct {
 	Host        string
 	ServiceName string
 	LogSpans    bool

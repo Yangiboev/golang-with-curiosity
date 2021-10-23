@@ -1,7 +1,7 @@
 definitions:
   models.Product:
     properties:
-      CategoryId:
+      categoryId:
         type: string
       createdAt:
         type: string

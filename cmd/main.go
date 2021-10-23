@@ -42,7 +42,7 @@ func main() {
 		cfg.Server.Development,
 	)
 	appLogger.Infof("Success parsed config: %#v", cfg.AppVersion)
-	tracer, closer, err := jaegar.InitJaegar(cfg)
+	tracer, closer, err := jaegar.InitJaeger(cfg)
 	if err != nil {
 		appLogger.Fatal("cannot create tracer", err)
 	}
@@ -60,16 +60,16 @@ func main() {
 		}
 	}()
 	appLogger.Infof("MongoDB connected: %v", mongoDBConn.NumberSessionsInProgress())
-	kafkaConn, err := kafka.NewKafkaConn(ctx, cfg)
-	if err != nil {
-		appLogger.Fatal("cannot create kafka", err)
-	}
-	defer kafkaConn.Close()
-	brokers, err := kafkaConn.Brokers()
+	conn, err := kafka.NewKafkaConn(ctx, cfg)
 	if err != nil {
 		appLogger.Fatal("NewKafkaConn", err)
 	}
-	appLogger.Infof("Kafka connected: %v", brokers)
+	defer conn.Close()
+	// brokers, err := conn.Brokers()
+	// if err != nil {
+	// 	appLogger.Fatal("conn.Brokers", err)
+	// }
+	// appLogger.Infof("Kafka connected: %v", brokers)
 	redisClient := redis.NewRedisClient(cfg)
 	appLogger.Info("Redis connected")
 

@@ -11,11 +11,8 @@ github.com/PuerkitoBio/purell
 github.com/PuerkitoBio/urlesc
 # github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 ## explicit
-github.com/alecthomas/template
-github.com/alecthomas/template/parse
 # github.com/alicebob/miniredis v2.5.0+incompatible
 ## explicit
-github.com/alicebob/miniredis/server
 # github.com/avast/retry-go v3.0.0+incompatible
 ## explicit
 github.com/avast/retry-go

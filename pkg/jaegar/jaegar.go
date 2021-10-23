@@ -1,6 +1,7 @@
 package jaegar
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/Yangiboev/golang-with-curiosity/config"
@@ -11,19 +12,20 @@ import (
 	"github.com/uber/jaeger-lib/metrics"
 )
 
-func InitJaegar(cfg config.Config) (opentracing.Tracer, io.Closer, error) {
-	jaegarCfgInstance := jaegercfg.Configuration{
-		ServiceName: cfg.Jaegar.ServiceName,
+func InitJaeger(cfg config.Config) (opentracing.Tracer, io.Closer, error) {
+	fmt.Println(cfg.Jaeger.ServiceName)
+	jaegerCfgInstance := jaegercfg.Configuration{
+		ServiceName: cfg.Jaeger.ServiceName,
 		Sampler: &jaegercfg.SamplerConfig{
 			Type:  jaeger.SamplerTypeConst,
 			Param: 1,
 		},
 		Reporter: &jaegercfg.ReporterConfig{
-			LogSpans:           cfg.Jaegar.LogSpans,
-			LocalAgentHostPort: cfg.Jaegar.Host,
+			LogSpans:           cfg.Jaeger.LogSpans,
+			LocalAgentHostPort: cfg.Jaeger.Host,
 		},
 	}
-	return jaegarCfgInstance.NewTracer(
+	return jaegerCfgInstance.NewTracer(
 		jaegercfg.Logger(jaegerlog.StdLogger),
 		jaegercfg.Metrics(metrics.NullFactory),
 	)
