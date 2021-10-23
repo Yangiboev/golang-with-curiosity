@@ -1,5 +1,7 @@
 package product
 
+import "github.com/labstack/echo/v4"
+
 // HttpDelivery http delivery
 type HttpDelivery interface {
 	CreateProduct() echo.HandlerFunc
